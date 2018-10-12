@@ -3,7 +3,7 @@ import torch.nn.functional as functional
 import torch.optim as optim
 
 RELU = functional.relu
-FILTERS = 64
+FILTERS = 6 #default 6
 
 
 class CNN(nn.Module):

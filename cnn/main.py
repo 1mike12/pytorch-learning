@@ -9,12 +9,12 @@ import numpy as np
 from cnn.CNN import CNN
 
 DATA_DIR = '../../data'
-RUN_ON_GPU = True
-BATCH_SIZE = 200
+RUN_ON_GPU = False
+BATCH_SIZE = 4  # default 4
 NEED_TO_DL_DATASET = False
 
-EPOCHS = 6
-LOG_EVERY_X_BATCHES = 50
+EPOCHS = 2 #default 2
+LOG_EVERY_X_BATCHES = int(8000 / BATCH_SIZE)  #default 2000
 
 
 def main():
@@ -87,7 +87,7 @@ def main():
             runs = runs + 1
             # if runs > 2000:
             #     break
-            if i % LOG_EVERY_X_BATCHES == (LOG_EVERY_X_BATCHES - 1):  # print every 500 mini-batches
+            if i % LOG_EVERY_X_BATCHES == (LOG_EVERY_X_BATCHES - 1):
                 print(f'[{epoch + 1}, {i+1}] loss: {epoch + 1, i + 1, runningLoss / LOG_EVERY_X_BATCHES}')
                 runningLoss = 0.0
                 print(timer() - start)
