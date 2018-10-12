@@ -3,8 +3,6 @@ import torchvision
 import torchvision.transforms as transforms
 from timeit import default_timer as timer
 import datetime
-import torch.nn as nn
-import torch.optim as optim
 import matplotlib.pyplot as plt
 import numpy as np
 
@@ -32,11 +30,11 @@ def main():
         transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
     ])
 
-    trainset = torchvision.datasets.CIFAR10(root=DATA_DIR, train=True, download=True, transform=transform)
-    trainloader = torch.utils.data.DataLoader(trainset, batch_size=BATCH_SIZE, shuffle=True, num_workers=2)
+    trainingSet = torchvision.datasets.CIFAR10(root=DATA_DIR, train=True, download=True, transform=transform)
+    trainingLoader = torch.utils.data.DataLoader(trainingSet, batch_size=BATCH_SIZE, shuffle=True, num_workers=2)
 
-    testset = torchvision.datasets.CIFAR10(root=DATA_DIR, train=False, download=True, transform=transform)
-    testloader = torch.utils.data.DataLoader(testset, batch_size=BATCH_SIZE, shuffle=False, num_workers=2)
+    testSet = torchvision.datasets.CIFAR10(root=DATA_DIR, train=False, download=True, transform=transform)
+    testLoader = torch.utils.data.DataLoader(testSet, batch_size=BATCH_SIZE, shuffle=False, num_workers=2)
 
     classes = ('plane', 'car', 'bird', 'cat', 'deer', 'dog', 'frog', 'horse', 'ship', 'truck')
 
@@ -51,29 +49,15 @@ def main():
         plt.imshow(np.transpose(npimg, (1, 2, 0)))
 
     # get some random training images
-    dataiter = iter(trainloader)
-    images, labels = dataiter.next()
+    # data = iter(trainingLoader)
+    # images, labels = data.next()
 
     # show images
     # showImage(torchvision.utils.make_grid(images))
     # print labels
-    print(' '.join('%5s' % classes[labels[j]] for j in range(4)))
-
-    ########################################################################
-    # 2. Define a Convolution Neural Network
-    # ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-    # Copy the neural network from the Neural Networks section before and modify it to
-    # take 3-channel images (instead of 1-channel images as it was defined).
+    # print(' '.join('%5s' % classes[labels[j]] for j in range(4)))
 
     cnn = CNN(device)
-
-    ########################################################################
-    # 3. Define a Loss function and optimizer
-    # ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-    # Let's use a Classification Cross-Entropy loss and SGD with momentum.
-
-    criterion = nn.CrossEntropyLoss().to(device)
-    optimizer = optim.SGD(cnn.parameters(), lr=0.001, momentum=0.9)
 
     ########################################################################
     # 4. Train the network
@@ -84,15 +68,20 @@ def main():
     # network and optimize.
     start = timer()
     print(datetime.datetime.now())
+
+    runs = 0
     for epoch in range(1):  # loop over the dataset multiple times
 
         runningLoss = 0.0
-        for i, data in enumerate(trainloader, 0):
+        for i, data in enumerate(trainingLoader, 0):
             # get the inputs
             inputs, labels = data
 
             # print statistics
             runningLoss += cnn.runAndGetLoss(inputs, labels)
+            runs = runs + 1
+            if runs >= 4000:
+                break
             if i % 2000 == 1999:  # print every 2000 mini-batches
 
                 print('[%d, %5d] loss: %.3f' % (epoch + 1, i + 1, runningLoss / 2000))
@@ -116,8 +105,8 @@ def main():
     #
     # Okay, first step. Let us display an image from the test set to get familiar.
 
-    dataiter = iter(testloader)
-    images, labels = dataiter.next()
+    data = iter(testLoader)
+    images, labels = data.next()
 
     # print images
     # showImage(torchvision.utils.make_grid(images))
@@ -145,7 +134,7 @@ def main():
     correct = 0
     total = 0
     with torch.no_grad():
-        for data in testloader:
+        for data in testLoader:
             images, labels = data
             outputs = cnn(images)
             _, predicted = torch.max(outputs.data, 1)
@@ -165,7 +154,7 @@ def main():
     class_correct = list(0. for i in range(10))
     class_total = list(0. for i in range(10))
     with torch.no_grad():
-        for data in testloader:
+        for data in testLoader:
             images, labels = data
             outputs = cnn(images)
             _, predicted = torch.max(outputs, 1)
