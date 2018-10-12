@@ -15,7 +15,7 @@ NEED_TO_DL_DATASET = False
 
 EPOCHS = 2 #default 2
 LOG_EVERY_X_BATCHES = int(8000 / BATCH_SIZE)  #default 2000
-
+LEARNING_RATE = .001 #default .001
 
 def main():
     if RUN_ON_GPU:
@@ -61,7 +61,7 @@ def main():
     # print labels
     # print(' '.join('%5s' % classes[labels[j]] for j in range(4)))
 
-    cnn = CNN(device)
+    cnn = CNN(device, LEARNING_RATE)
 
     ########################################################################
     # 4. Train the network

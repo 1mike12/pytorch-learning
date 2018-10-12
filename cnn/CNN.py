@@ -3,12 +3,12 @@ import torch.nn.functional as functional
 import torch.optim as optim
 
 RELU = functional.relu
-FILTERS = 6 #default 6
+FILTERS = 6  # default 6
 
 
 class CNN(nn.Module):
 
-    def __init__(self, device):
+    def __init__(self, device, learningRate):
         super(CNN, self).__init__()
         self.criterion = nn.CrossEntropyLoss().to(device)
 
@@ -20,13 +20,13 @@ class CNN(nn.Module):
         self.fc2 = nn.Linear(120, 84)
         self.fc3 = nn.Linear(84, 10)
 
-        self.optimizer = optim.SGD(self.parameters(), lr=0.001, momentum=0.9)
+        self.optimizer = optim.SGD(self.parameters(), lr=learningRate, momentum=0.9)
         self.to(device)
 
     def forward(self, x):
         x = self.pool(RELU(self.conv1(x)))
         x = self.pool(RELU(self.conv2(x)))
-        x = x.view(-1, 16 * 5 * 5)
+        x = x.view(-1, x.shape[1] * x.shape[2] * x.shape[3])
         x = RELU(self.fc1(x))
         x = RELU(self.fc2(x))
         x = self.fc3(x)
