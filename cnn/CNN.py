@@ -3,7 +3,7 @@ import torch.nn.functional as functional
 import torch.optim as optim
 
 RELU = functional.relu
-filters = 32
+FILTERS = 64
 
 
 class CNN(nn.Module):
@@ -13,9 +13,9 @@ class CNN(nn.Module):
         self.criterion = nn.CrossEntropyLoss().to(device)
 
         # (in_channels, out_channels, kernel_size, stride=1, padding=0, dilation=1, groups=1, bias=Tru
-        self.conv1 = nn.Conv2d(3, filters, 5)
+        self.conv1 = nn.Conv2d(3, FILTERS, 5)
         self.pool = nn.MaxPool2d(2, 2)
-        self.conv2 = nn.Conv2d(filters, 16, 5)
+        self.conv2 = nn.Conv2d(FILTERS, 16, 5)
         self.fc1 = nn.Linear(16 * 5 * 5, 120)
         self.fc2 = nn.Linear(120, 84)
         self.fc3 = nn.Linear(84, 10)
