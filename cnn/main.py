@@ -11,7 +11,7 @@ from cnn.CNN import CNN
 DATA_DIR = '../../data'
 RUN_ON_GPU = False
 BATCH_SIZE = 4
-
+NEED_TO_DL_DATASET = False
 
 def main():
     if RUN_ON_GPU:
@@ -30,10 +30,10 @@ def main():
         transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
     ])
 
-    trainingSet = torchvision.datasets.CIFAR10(root=DATA_DIR, train=True, download=True, transform=transform)
+    trainingSet = torchvision.datasets.CIFAR10(root=DATA_DIR, train=True, download=NEED_TO_DL_DATASET, transform=transform)
     trainingLoader = torch.utils.data.DataLoader(trainingSet, batch_size=BATCH_SIZE, shuffle=True, num_workers=2)
 
-    testSet = torchvision.datasets.CIFAR10(root=DATA_DIR, train=False, download=True, transform=transform)
+    testSet = torchvision.datasets.CIFAR10(root=DATA_DIR, train=False, download=NEED_TO_DL_DATASET, transform=transform)
     testLoader = torch.utils.data.DataLoader(testSet, batch_size=BATCH_SIZE, shuffle=False, num_workers=2)
 
     classes = ('plane', 'car', 'bird', 'cat', 'deer', 'dog', 'frog', 'horse', 'ship', 'truck')
@@ -76,11 +76,12 @@ def main():
         for i, data in enumerate(trainingLoader, 0):
             # get the inputs
             inputs, labels = data
-
+            inputs = inputs.to(device)
+            labels = labels.to(device)
             # print statistics
             runningLoss += cnn.runAndGetLoss(inputs, labels)
             runs = runs + 1
-            if runs >= 4000:
+            if runs >= 1000:
                 break
             if i % 2000 == 1999:  # print every 2000 mini-batches
 
@@ -89,8 +90,9 @@ def main():
                 print(timer() - start)
                 start = timer()
 
-    print('Finished Training\n')
+    print('Finished Training')
     print(datetime.datetime.now())
+    print("\n")
 
     ########################################################################
     # 5. Test the network on the test data
@@ -107,6 +109,8 @@ def main():
 
     data = iter(testLoader)
     images, labels = data.next()
+    images = images.to(device)
+    labels = labels.to(device)
 
     # print images
     # showImage(torchvision.utils.make_grid(images))
@@ -136,6 +140,8 @@ def main():
     with torch.no_grad():
         for data in testLoader:
             images, labels = data
+            images = images.to(device)
+            labels = labels.to(device)
             outputs = cnn(images)
             _, predicted = torch.max(outputs.data, 1)
             total += labels.size(0)
@@ -156,6 +162,8 @@ def main():
     with torch.no_grad():
         for data in testLoader:
             images, labels = data
+            images = images.to(device)
+            labels = labels.to(device)
             outputs = cnn(images)
             _, predicted = torch.max(outputs, 1)
             c = (predicted == labels).squeeze()
