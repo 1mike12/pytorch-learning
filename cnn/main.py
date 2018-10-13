@@ -10,10 +10,10 @@ from cnn.CNN import CNN
 
 DATA_DIR = '../../data'
 RUN_ON_GPU = True
-BATCH_SIZE = 16  # default 4
+BATCH_SIZE = 4  # default 4
 NEED_TO_DL_DATASET = False
 
-EPOCHS = 10  # default 2
+EPOCHS = 20  # default 2
 LOG_EVERY_X_BATCHES = int(16000 / BATCH_SIZE)  # default 2000
 LEARNING_RATE = .001  # default .001
 

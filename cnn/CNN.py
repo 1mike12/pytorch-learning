@@ -3,7 +3,7 @@ import torch.nn.functional as functional
 import torch.optim as optim
 
 RELU = functional.relu
-FILTERS = 16  # default 6
+FILTERS = 32  # default 6
 FILTER_DIMENSIONS = 3
 PADDING = 1
 
@@ -18,9 +18,9 @@ class CNN(nn.Module):
         self.conv1 = nn.Conv2d(3, FILTERS, FILTER_DIMENSIONS, padding=PADDING)
         self.pool = nn.MaxPool2d(2, 2)
         self.conv2 = nn.Conv2d(FILTERS, FILTERS, FILTER_DIMENSIONS, padding=PADDING)
-        self.fc1 = nn.Linear(1024, 512)
-        self.fc2 = nn.Linear(512, 256)
-        self.fc3 = nn.Linear(256, 10)
+        self.fc1 = nn.Linear(512, 128)
+        self.fc2 = nn.Linear(128, 64)
+        self.fc3 = nn.Linear(64, 10)
 
         self.optimizer = optim.SGD(self.parameters(), lr=learningRate, momentum=0.9)
         self.to(device)
