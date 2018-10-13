@@ -9,13 +9,14 @@ import numpy as np
 from cnn.CNN import CNN
 
 DATA_DIR = '../../data'
-RUN_ON_GPU = False
-BATCH_SIZE = 4  # default 4
+RUN_ON_GPU = True
+BATCH_SIZE = 16  # default 4
 NEED_TO_DL_DATASET = False
 
-EPOCHS = 2 #default 2
-LOG_EVERY_X_BATCHES = int(8000 / BATCH_SIZE)  #default 2000
-LEARNING_RATE = .001 #default .001
+EPOCHS = 10  # default 2
+LOG_EVERY_X_BATCHES = int(16000 / BATCH_SIZE)  # default 2000
+LEARNING_RATE = .001  # default .001
+
 
 def main():
     if RUN_ON_GPU:
