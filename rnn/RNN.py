@@ -1,4 +1,7 @@
 from __future__ import unicode_literals, print_function, division
+
+import math
+
 import torch.nn as nn
 import torch
 import torch.nn.functional as functional
@@ -21,7 +24,6 @@ class RNN(nn.Module):
         self.inputToHidden = nn.Linear(inputSize + hiddenSize, hiddenSize)
         self.inputToOutput = nn.Linear(inputSize + hiddenSize, outputSize)
         self.softmax = nn.LogSoftmax(dim=1)
-        self.hidden = None
         self.optimizer = optim.SGD(self.parameters(), lr=learningRate, momentum=momentum)
         self.to(device)
 
@@ -34,18 +36,30 @@ class RNN(nn.Module):
 
     def runAndGetLoss(self, inputs, categoryTensor):
         self.optimizer.zero_grad()
-        output = self(inputs)
+        hidden = torch.zeros(1, self.hiddenSize)
+        for i in range(inputs.size()[0]):
+            output, hidden = self(inputs[i], hidden)
+
         loss = self.criterion(output, categoryTensor)
         loss.backward()
         self.optimizer.step()
-        return output, loss
+        if math.isnan(loss):
+            x = 0
+        return output, loss.item()
 
-    def unicodeToAscii(self, input):
+    def predict(self, inputs):
+        hidden = torch.zeros(1, self.hiddenSize)
+        for i in range(inputs.size()[0]):
+            output, hidden = self(inputs[i], hidden)
+        return output
+
+    @staticmethod
+    def unicodeToAscii(charSet, input):
         input = input.lower()
         return ''.join(
             c for c in unicodedata.normalize('NFD', input)
             if unicodedata.category(c) != 'Mn'
-            and c in self.charSet
+            and c in charSet
         )
 
     # throws KeyError if not in charSet
@@ -57,7 +71,7 @@ class RNN(nn.Module):
         :param sentence: any unicode string
         :return: converted to tensor
         """
-        sentence = self.unicodeToAscii(sentence)
+        sentence = RNN.unicodeToAscii(self.charSet, sentence)
         tensor = torch.zeros(len(sentence), 1, len(self.charSet))
         for i, letter in enumerate(sentence):
             tensor[i][0][self.indexForChar(letter)] = 1
