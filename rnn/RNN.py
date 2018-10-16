@@ -43,8 +43,6 @@ class RNN(nn.Module):
         loss = self.criterion(output, categoryTensor)
         loss.backward()
         self.optimizer.step()
-        if math.isnan(loss):
-            x = 0
         return output, loss.item()
 
     def predict(self, inputs):
