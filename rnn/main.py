@@ -10,7 +10,8 @@ import time
 import random
 
 from Util import timeSince
-from rnn.RNN import RNN
+from model.RNN import RNN
+from util.Tensorizer import Tensorizer
 
 CHAR_SET = "abcdefghijklmnopqrstuvwxyz" + ".,';"
 
@@ -37,10 +38,11 @@ if RUN_ON_GPU:
 else:
     DEVICE = torch.device("cpu")
 
+tensorizer = Tensorizer(CHAR_SET)
 
 def readLines(filename):
     lines = open(filename, encoding='utf-8').read().strip().split('\n')
-    return [RNN.unicodeToAscii(CHAR_SET, line) for line in lines]
+    return [tensorizer.unicodeToAscii(line) for line in lines]
 
 
 for fileName in glob.glob("./names/*.txt"):
@@ -54,7 +56,7 @@ start = time.time()
 # =============================
 
 
-rnn = RNN(CHAR_SET, DEVICE, LEARNING_RATE, MOMENTUM, len(CHAR_SET), HIDDEN_SIZE, len(all_categories))
+model = RNN(CHAR_SET, DEVICE, LEARNING_RATE, MOMENTUM, len(CHAR_SET), HIDDEN_SIZE, len(all_categories))
 
 
 def randomChoice(l):
@@ -65,7 +67,7 @@ def randomTrainingExample():
     category = randomChoice(all_categories)
     line = randomChoice(category_lines[category])
     category_tensor = torch.tensor([all_categories.index(category)], dtype=torch.long)
-    line_tensor = rnn.sentenceToTensor(line)
+    line_tensor = tensorizer.sentenceToTensor(line)
     return category, line, category_tensor, line_tensor
 
 
@@ -77,7 +79,7 @@ def categoryFromOutput(output):
 
 for i in range(1, ITERATIONS + 1):
     category, line, category_tensor, line_tensor = randomTrainingExample()
-    output, loss = rnn.runAndGetLoss(line_tensor, category_tensor)
+    output, loss = model.runAndGetLoss(line_tensor, category_tensor)
     current_loss += loss
 
     # Print iter number, loss, name and guess
@@ -99,7 +101,7 @@ for i in range(1, ITERATIONS + 1):
 def predict(input_line, n_predictions=3):
     print('\n> %s' % input_line)
     with torch.no_grad():
-        output = rnn.predict(rnn.sentenceToTensor(input_line))
+        output = model.predict(tensorizer.sentenceToTensor(input_line))
 
         # Get top N categories
         topv, topi = output.topk(n_predictions, 1, True)
