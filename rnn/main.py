@@ -10,7 +10,7 @@ import time
 import random
 
 from Util import timeSince
-from model.RNN import RNN
+from rnn.RNN import RNN
 from util.Tensorizer import Tensorizer
 
 CHAR_SET = "abcdefghijklmnopqrstuvwxyz" + ".,';"
@@ -40,6 +40,7 @@ else:
 
 tensorizer = Tensorizer(CHAR_SET)
 
+
 def readLines(filename):
     lines = open(filename, encoding='utf-8').read().strip().split('\n')
     return [tensorizer.unicodeToAscii(line) for line in lines]
@@ -56,7 +57,7 @@ start = time.time()
 # =============================
 
 
-model = RNN(CHAR_SET, DEVICE, LEARNING_RATE, MOMENTUM, len(CHAR_SET), HIDDEN_SIZE, len(all_categories))
+model = RNN(DEVICE, LEARNING_RATE, MOMENTUM, len(CHAR_SET), HIDDEN_SIZE, len(all_categories))
 
 
 def randomChoice(l):

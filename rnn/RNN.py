@@ -8,12 +8,9 @@ import unicodedata
 
 class RNN(nn.Module):
 
-    def __init__(self, characters, device, learningRate, momentum, inputSize, hiddenSize, outputSize):
+    def __init__(self, device, learningRate, momentum, inputSize, hiddenSize, outputSize, batchSize=None):
         super(RNN, self).__init__()
-        self.charSet = {}
 
-        for i, char in enumerate(characters):
-            self.charSet[char] = i
         self.criterion = nn.NLLLoss().to(device)
 
         self.hiddenSize = hiddenSize
@@ -32,7 +29,7 @@ class RNN(nn.Module):
 
     def runAndGetLoss(self, inputs, categoryTensor):
         self.optimizer.zero_grad()
-        hidden = torch.zeros(1, self.hiddenSize)
+        hidden = self.getHidden()
         for i in range(inputs.size()[0]):
             output, hidden = self(inputs[i], hidden)
 
@@ -42,11 +39,10 @@ class RNN(nn.Module):
         return output, loss.item()
 
     def predict(self, inputs):
-        hidden = torch.zeros(1, self.hiddenSize)
+        hidden = self.getHidden()
         for i in range(inputs.size()[0]):
             output, hidden = self(inputs[i], hidden)
         return output
 
-    # throws KeyError if not in charSet
-    def indexForChar(self, char):
-        return self.charSet[char]
+    def getHidden(self):
+        return torch.zeros(1, self.hiddenSize)

@@ -25,8 +25,8 @@ class CNN(nn.Module):
         self.optimizer = optim.SGD(self.parameters(), lr=learningRate, momentum=0.9)
         self.to(device)
 
-    def forward(self, x):
-        out = self.pool(RELU(self.conv1(x)))
+    def forward(self, input):
+        out = self.pool(RELU(self.conv1(input)))
         out = self.pool(RELU(self.conv2(out)))
         out = self.pool(RELU(self.conv2(out)))
         out = out.view(-1, out.shape[1] * out.shape[2] * out.shape[3])
